@@ -8,6 +8,7 @@
             "email": "3fallart3@gmail.com"
         }
     ],
+    "license": "MIT",
     "require": {
         "psr/event-dispatcher": "^1.0",
         "psr/log": "^1.1",
