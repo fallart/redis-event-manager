@@ -18,6 +18,7 @@ if (!$client->isConnected()) {
 $subscriber = new \RedisEventDispatcher\Subscriber(
     $client,
     new \RedisEventDispatcherExample\ListenersMap(),
-    new Container() // here you need some container
+    new Container(), // here you need some container
+    new \Psr\Log\Test\TestLogger()
 );
 $subscriber->subscribe();
