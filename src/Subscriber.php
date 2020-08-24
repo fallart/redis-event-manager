@@ -35,7 +35,8 @@ class Subscriber
         $client->subscribe(
             $map->getEventsList(),
             function (Redis $client, string $event, string $message) use ($map, $container) {
-                $eventObject = unserialize($message);
+                /** @var EventInterface|string $event - only for hinting */
+                $eventObject = $event::createFromArray(json_decode($message, true));
 
                 foreach ($map->getListenersForEvent($eventObject) as $listenerClassname) {
                     $listener = $container->get($listenerClassname);

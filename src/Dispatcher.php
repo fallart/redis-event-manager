@@ -20,6 +20,6 @@ class Dispatcher implements EventDispatcherInterface
      */
     public function dispatch(object $event)
     {
-        $this->client->publish(get_class($event), serialize($event));
+        $this->client->publish(get_class($event), json_encode($event));
     }
 }
