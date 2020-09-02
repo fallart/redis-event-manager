@@ -4,15 +4,18 @@ declare(strict_types=1);
 namespace RedisEventDispatcher;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Log\LoggerInterface;
 use Redis;
 
 class Dispatcher implements EventDispatcherInterface
 {
     private Redis $client;
+    private LoggerInterface $logger;
 
-    public function __construct(Redis $client)
+    public function __construct(Redis $client, LoggerInterface $logger)
     {
         $this->client = $client;
+        $this->logger = $logger;
     }
 
     /**
@@ -20,6 +23,9 @@ class Dispatcher implements EventDispatcherInterface
      */
     public function dispatch(object $event)
     {
-        $this->client->publish(get_class($event), json_encode($event));
+        $eventName = get_class($event);
+
+        $this->logger->info(sprintf('Dispatching event: %s', $eventName));
+        $this->client->publish($eventName, json_encode($event));
     }
 }

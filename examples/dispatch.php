@@ -15,5 +15,5 @@ if (!$client->isConnected()) {
     exit;
 }
 
-$dispatcher = new \RedisEventDispatcher\Dispatcher($client);
+$dispatcher = new \RedisEventDispatcher\Dispatcher($client, $logger); // Add logger here
 $dispatcher->dispatch(new \RedisEventDispatcherExample\SomeEvent('John Doe', 'Hello World!'));

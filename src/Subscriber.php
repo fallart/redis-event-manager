@@ -48,10 +48,12 @@ class Subscriber
                 try {
                     /** @var EventInterface|string $event - only for hinting */
                     $eventObject = $event::createFromArray(json_decode($message, true));
+                    $logger->info(sprintf('Event received: %s', $event));
 
                     foreach ($map->getListenersForEvent($eventObject) as $listenerClassname) {
                         try {
                             $listener = $container->get($listenerClassname);
+                            $logger->info(sprintf('Trigger listener <<%s>> for event <<%s>>', $listenerClassname, $event));
                             $listener($eventObject);
                         } catch (Throwable $exception) {
                             $logger->error(
