@@ -14,25 +14,29 @@ class Subscriber
     private ListenersMapInterface $listenersMap;
     private ContainerInterface $container;
     private LoggerInterface $logger;
+    private ?DbReconnectServiceInterface $dbReconnectService = null;
 
     /**
      * Subscriber constructor.
      *
-     * @param Redis                 $client
-     * @param ListenersMapInterface $listenersMap
-     * @param ContainerInterface    $container
-     * @param LoggerInterface       $logger
+     * @param Redis                       $client
+     * @param ListenersMapInterface       $listenersMap
+     * @param ContainerInterface          $container
+     * @param LoggerInterface             $logger
+     * @param DbReconnectServiceInterface $dbReconnectService
      */
     public function __construct(
         Redis $client,
         ListenersMapInterface $listenersMap,
         ContainerInterface $container,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        ?DbReconnectServiceInterface $dbReconnectService
     ) {
         $this->client = $client;
         $this->listenersMap = $listenersMap;
         $this->container = $container;
         $this->logger = $logger;
+        $this->dbReconnectService = $dbReconnectService;
     }
 
     public function subscribe()
@@ -49,6 +53,7 @@ class Subscriber
                     /** @var EventInterface|string $event - only for hinting */
                     $eventObject = $event::createFromArray(json_decode($message, true));
                     $logger->info(sprintf('Event received: %s', $event));
+                    $this->reconnectDb();
 
                     foreach ($map->getListenersForEvent($eventObject) as $listenerClassname) {
                         try {
@@ -86,5 +91,12 @@ class Subscriber
                 }
             }
         );
+    }
+
+    private function reconnectDb(): void
+    {
+        if ($this->dbReconnectService !== null) {
+            $this->dbReconnectService->reconnect();
+        }
     }
 }
